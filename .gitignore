@@ -10,6 +10,10 @@
 /WaveFunctionCollapse/[Ll]ogs/
 /WaveFunctionCollapse/[Uu]ser[Ss]ettings/
 
+# References are likely large and may include files pulled from the internet,
+# so not a great idea to commit.
+/References/
+
 # MemoryCaptures can get excessive in size.
 # They also could contain extremely sensitive data
 /WaveFunctionCollapse/[Mm]emoryCaptures/

@@ -1,0 +1,16 @@
+FEATURES:
+- some sort of generation
+- interact with the world to trigger regen
+- slow down generation steps
+
+2D idea:
+- User creates a bunch of sprites (or edits from a template)
+- User can then select certain tiles in a grid to force to be a certain sprite
+- Wave function collapse fills in the rest
+
+Task breakdown:
+- Wave function collapse from list of sprites into grid
+- Generation speed slider
+- Tile constraints
+- Sprite editing
+- Tile visualization
