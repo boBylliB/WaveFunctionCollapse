@@ -5,14 +5,17 @@ using UnityEngine;
 using System.Linq;
 using System.Xml.Linq;
 using System.ComponentModel;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.PixelFormats;
+//using SixLabors.ImageSharp;
+//using SixLabors.ImageSharp.PixelFormats;
 
 /* Very much based on the Wave Function Collapse code written by Maxim Gumin
  * https://github.com/mxgmn/WaveFunctionCollapse/tree/master
  */
 
 // Based on the simple tiled model, again from Maxim Gumin's SimpleTiledModel.cs
+// Tiles are always square, stored as a .png, in a folder of the name of the tileset
+// The tileset also has a .xml file of the same name in the Tilesets directory, detailing each tile's symmetry and weight
+// The .xml file also lists the possible neighbors of each tile
 // Copyright (C) 2016 Maxim Gumin, The MIT License (MIT)
 public class WaveFunctionCollapse : WFCModel
 {
@@ -20,7 +23,7 @@ public class WaveFunctionCollapse : WFCModel
     List<string> tilenames;
     int tilesize;
     bool blackBackground;
-
+    
     public WaveFunctionCollapse(string name, string subsetName, int width, int height, bool periodic, bool blackBackground, Heuristic heuristic) : base(width, height, 1, periodic, heuristic)
     {
         this.blackBackground = blackBackground;
@@ -533,10 +536,17 @@ static class BitmapHelper
 {
     public static (int[], int, int) LoadBitmap(string filename)
     {
-        using var image = Image.Load<Bgra32>(filename);
-        int width = image.Width, height = image.Height;
+        // Bitmaps are an array of integers, with each integer storing the pixel data in the format: 0xAARRGGBB
+        Texture2D image = new Texture2D(2, 2); // Size doesn't matter here, as it will immediately be overwritten by the image loading process
+        image.LoadImage(System.IO.File.ReadAllBytes(filename));
+
+        int width = image.width, height = image.height;
         int[] result = new int[width * height];
-        image.CopyPixelDataTo(MemoryMarshal.Cast<int, Bgra32>(result));
+        Color32[] pixelData = image.GetPixels32();
+        for (int idx = 0; idx < width * height; idx++)
+        {
+            result[idx] = unchecked((int)0xff000000 | ((int)pixelData[idx].r << 16) | ((int)pixelData[idx].g << 8) | (int)pixelData[idx].b);
+        }
         return (result, width, height);
     }
 
