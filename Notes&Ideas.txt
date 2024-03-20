@@ -1,3 +1,8 @@
+TODO:
+Figure out how to get SixLabors ImageSharp working in Unity
+Translate saving and outputs into displaying it in Unity
+Rework WaveFunctionCollapse (simple tiled model) especially, currently just a copy-paste and likely needs a full rework
+
 FEATURES:
 - some sort of generation
 - interact with the world to trigger regen
