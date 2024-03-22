@@ -1,0 +1,7 @@
+skew 1, substrate 0, vias 0, t 1, connection 1, component 0, connection 3, 
+skew 2, substrate 0, skew 3, dskew 1, connection 1, component 0, connection 3, 
+skew 0, vias 1, track 0, vias 0, corner 2, connection 2, corner 3, 
+skew 3, t 0, dskew 0, track 1, skew 2, t 1, skew 2, 
+vias 0, skew 0, dskew 0, vias 1, t 1, skew 1, track 0, 
+track 1, track 1, dskew 0, vias 1, skew 0, skew 2, skew 0, 
+skew 3, track 1, dskew 0, skew 2, corner 1, connection 0, corner 0, 

@@ -5,8 +5,6 @@ using UnityEngine;
 using System.Linq;
 using System.Xml.Linq;
 using System.ComponentModel;
-//using SixLabors.ImageSharp;
-//using SixLabors.ImageSharp.PixelFormats;
 
 /* Very much based on the Wave Function Collapse code written by Maxim Gumin
  * https://github.com/mxgmn/WaveFunctionCollapse/tree/master
@@ -27,7 +25,7 @@ public class WaveFunctionCollapse : WFCModel
     public WaveFunctionCollapse(string name, string subsetName, int width, int height, bool periodic, bool blackBackground, Heuristic heuristic) : base(width, height, 1, periodic, heuristic)
     {
         this.blackBackground = blackBackground;
-        XElement xroot = XDocument.Load($"tilesets/{name}.xml").Root;
+        XElement xroot = XDocument.Load($"Assets/Tilesets/{name}.xml").Root;
         bool unique = xroot.Get("unique", false);
 
         List<string> subset = null;
@@ -127,7 +125,7 @@ public class WaveFunctionCollapse : WFCModel
                 for (int t = 0; t < cardinality; t++)
                 {
                     int[] bitmap;
-                    (bitmap, tilesize, tilesize) = BitmapHelper.LoadBitmap($"tilesets/{name}/{tilename} {t}.png");
+                    (bitmap, tilesize, tilesize) = BitmapHelper.LoadBitmap($"Assets/Tilesets/{name}/{tilename} {t}.png");
                     tiles.Add(bitmap);
                     tilenames.Add($"{tilename} {t}");
                 }
@@ -135,7 +133,7 @@ public class WaveFunctionCollapse : WFCModel
             else
             {
                 int[] bitmap;
-                (bitmap, tilesize, tilesize) = BitmapHelper.LoadBitmap($"tilesets/{name}/{tilename}.png");
+                (bitmap, tilesize, tilesize) = BitmapHelper.LoadBitmap($"Assets/Tilesets/{name}/{tilename}.png");
                 tiles.Add(bitmap);
                 tilenames.Add($"{tilename} 0");
 
@@ -543,19 +541,33 @@ static class BitmapHelper
         int width = image.width, height = image.height;
         int[] result = new int[width * height];
         Color32[] pixelData = image.GetPixels32();
-        for (int idx = 0; idx < width * height; idx++)
+        for (int idx = 0; idx < height; idx++)
         {
-            result[idx] = unchecked((int)0xff000000 | ((int)pixelData[idx].r << 16) | ((int)pixelData[idx].g << 8) | (int)pixelData[idx].b);
+            for (int jdx = 0; jdx < width; jdx++)
+            {
+                // Texture2D flattens the image data from leftt to right, bottom to top
+                // To use this we have to invert that "bottom to top" situation
+                int sourceIndex = idx * width + jdx;
+                int resultIndex = (height - idx - 1) * width + jdx;
+                result[resultIndex] = unchecked((int)0xff000000 | ((int)pixelData[sourceIndex].r << 16) | ((int)pixelData[sourceIndex].g << 8) | (int)pixelData[sourceIndex].b);
+            }
         }
         return (result, width, height);
     }
 
-    unsafe public static void SaveBitmap(int[] data, int width, int height, string filename)
+    public static void SaveBitmap(int[] data, int width, int height, string filename)
     {
-        fixed (int* pData = data)
+        Color32[] pixelData = new Color32[data.Length];
+        for (int idx = data.Length - 1; idx >= 0; idx--)
         {
-            using var image = Image.WrapMemory<Bgra32>(pData, width, height);
-            image.SaveAsPng(filename);
+            pixelData[idx].b = (byte)(data[idx]);
+            pixelData[idx].g = (byte)(data[idx] >> 8);
+            pixelData[idx].r = (byte)(data[idx] >> 16);
+            pixelData[idx].a = (byte)(data[idx] >> 24);
         }
+        Texture2D image = new Texture2D(width, height);
+        image.SetPixels32(pixelData);
+        image.Apply();
+        System.IO.File.WriteAllBytes(filename, image.EncodeToPNG());
     }
 }
