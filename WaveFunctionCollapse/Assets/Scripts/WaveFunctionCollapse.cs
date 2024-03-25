@@ -17,15 +17,18 @@ using System.ComponentModel;
 // Copyright (C) 2016 Maxim Gumin, The MIT License (MIT)
 public class WaveFunctionCollapse : WFCModel
 {
+    public GameManager gm;
+
     List<int[]> tiles;
     List<string> tilenames;
     int tilesize;
     bool blackBackground;
-    
-    public WaveFunctionCollapse(string name, string subsetName, int width, int height, bool periodic, bool blackBackground, Heuristic heuristic) : base(width, height, 1, periodic, heuristic)
+
+    public WaveFunctionCollapse(Tileset tileset, string subsetName, int width, int height, bool periodic, bool blackBackground, Heuristic heuristic, GameManager gm) : base(width, height, 1, periodic, heuristic)
     {
+        this.gm = gm;
         this.blackBackground = blackBackground;
-        XElement xroot = XDocument.Load($"Assets/Tilesets/{name}.xml").Root;
+        XElement xroot = XDocument.Parse(tileset.tileData.text).Root;
         bool unique = xroot.Get("unique", false);
 
         List<string> subset = null;
@@ -125,7 +128,8 @@ public class WaveFunctionCollapse : WFCModel
                 for (int t = 0; t < cardinality; t++)
                 {
                     int[] bitmap;
-                    (bitmap, tilesize, tilesize) = BitmapHelper.LoadBitmap($"Assets/Tilesets/{name}/{tilename} {t}.png");
+                    (bitmap, tilesize, tilesize) = tileset.getTilePixels($"{tilename} {t}");
+                    //(bitmap, tilesize, tilesize) = BitmapHelper.LoadBitmap($"Assets/Tilesets/{name}/{tilename} {t}.png");
                     tiles.Add(bitmap);
                     tilenames.Add($"{tilename} {t}");
                 }
@@ -133,7 +137,8 @@ public class WaveFunctionCollapse : WFCModel
             else
             {
                 int[] bitmap;
-                (bitmap, tilesize, tilesize) = BitmapHelper.LoadBitmap($"Assets/Tilesets/{name}/{tilename}.png");
+                (bitmap, tilesize, tilesize) = tileset.getTilePixels(tilename);
+                //(bitmap, tilesize, tilesize) = BitmapHelper.LoadBitmap($"Assets/Tilesets/{name}/{tilename}.png");
                 tiles.Add(bitmap);
                 tilenames.Add($"{tilename} 0");
 
@@ -248,7 +253,9 @@ public class WaveFunctionCollapse : WFCModel
                 }
             }
         }
-        BitmapHelper.SaveBitmap(bitmapData, MX * tilesize, MY * tilesize, filename);
+        //BitmapHelper.SaveBitmap(bitmapData, MX * tilesize, MY * tilesize, filename);
+        Texture2D newTexture = Tileset.pixelsToImage(bitmapData, MX * tilesize, MY * tilesize);
+        gm.outputImage.sprite = Sprite.Create(newTexture, new Rect(0f, 0f, newTexture.width, newTexture.height), new Vector2(0.5f, 0.5f));
     }
 
     public string TextOutput()
