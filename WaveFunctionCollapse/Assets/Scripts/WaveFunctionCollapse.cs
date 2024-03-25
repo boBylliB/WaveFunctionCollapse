@@ -35,7 +35,7 @@ public class WaveFunctionCollapse : WFCModel
         if (subsetName != null)
         {
             XElement xsubset = xroot.Element("subsets").Elements("subset").FirstOrDefault(x => x.Get<string>("name") == subsetName);
-            if (xsubset == null) Console.WriteLine($"ERROR: subset {subsetName} is not found");
+            if (xsubset == null) UnityEngine.Debug.Log($"ERROR: subset {subsetName} is not found");
             else subset = xsubset.Elements("tile").Select(x => x.Get<string>("name")).ToList();
         }
 
@@ -63,32 +63,32 @@ public class WaveFunctionCollapse : WFCModel
             Func<int, int> a, b; //a is 90 degrees rotation, b is reflection
             int cardinality;
 
-            char sym = xtile.Get("symmetry", 'X');
-            if (sym == 'L')
+            string sym = xtile.Get<string>("symmetry", "X");
+            if (sym == "L")
             {
                 cardinality = 4;
                 a = i => (i + 1) % 4;
                 b = i => i % 2 == 0 ? i + 1 : i - 1;
             }
-            else if (sym == 'T')
+            else if (sym == "T")
             {
                 cardinality = 4;
                 a = i => (i + 1) % 4;
                 b = i => i % 2 == 0 ? i : 4 - i;
             }
-            else if (sym == 'I')
+            else if (sym == "I")
             {
                 cardinality = 2;
                 a = i => 1 - i;
                 b = i => i;
             }
-            else if (sym == '\\')
+            else if (sym == "\\")
             {
                 cardinality = 2;
                 a = i => 1 - i;
                 b = i => 1 - i;
             }
-            else if (sym == 'F')
+            else if (sym == "F")
             {
                 cardinality = 8;
                 a = i => i < 4 ? (i + 1) % 4 : 4 + (i - 1) % 4;
@@ -207,7 +207,7 @@ public class WaveFunctionCollapse : WFCModel
                 for (int t2 = 0; t2 < T; t2++) if (tp[t2]) sp.Add(t2);
 
                 int ST = sp.Count;
-                if (ST == 0) Console.WriteLine($"ERROR: tile {tilenames[t1]} has no neighbors in direction {d}");
+                if (ST == 0) UnityEngine.Debug.Log($"ERROR: tile {tilenames[t1]} has no neighbors in direction {d}");
                 propagator[d][t1] = new int[ST];
                 for (int st = 0; st < ST; st++) propagator[d][t1][st] = sp[st];
             }

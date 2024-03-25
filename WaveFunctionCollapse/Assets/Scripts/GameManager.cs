@@ -83,11 +83,13 @@ public class GameManager : MonoBehaviour
 
             string subset = xelem.Get<string>("subset");
             bool blackBackground = xelem.Get("blackBackground", false);
+            UnityEngine.Debug.Log("Creating model");
             model = new WaveFunctionCollapse(tileset, subset, width, height, periodic, blackBackground, heuristic, this);
 
+            UnityEngine.Debug.Log("Attempting collapse");
             for (int k = 0; k < 10; k++)
             {
-                Console.Write("> ");
+                UnityEngine.Debug.Log($"Attempt {k+1}");
                 int seed = random.Next();
                 bool success = model.Run(seed, xelem.Get("limit", -1));
                 if (success)
